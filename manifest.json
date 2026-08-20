@@ -1,0 +1,26 @@
+{
+  "name": "Zorn ZFG - Generator EVD",
+  "short_name": "Zorn ZFG",
+  "description": "Generator EVD pentru placa Zorn ZFG 300mm/10kg",
+  "lang": "ro",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2f3",
+  "theme_color": "#1a5276",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

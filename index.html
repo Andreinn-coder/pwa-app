@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a5276">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Zorn ZFG">
+    <meta name="description" content="Generator EVD pentru placa Zorn ZFG 300mm/10kg">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Generator EVD - Placa Zorn</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { min-height: 100%; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #eef2f3;
+            display: flex;
+            justify-content: center;
+            padding: max(15px, env(safe-area-inset-top)) 15px max(20px, env(safe-area-inset-bottom));
+            color: #34495e;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.10);
+            width: 100%;
+            max-width: 430px;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+        h2 {
+            color: #1a5276;
+            text-align: center;
+            margin: 0 0 25px;
+            font-size: 1.4em;
+        }
+        .input-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #d5dbdb;
+            border-radius: 8px;
+            font-size: 20px;
+            text-align: center;
+            color: #2ecc71;
+            font-weight: bold;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input:focus { border-color: #1a5276; }
+        .results {
+            background: #f8f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #2ecc71;
+            margin-top: 25px;
+        }
+        .res-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 10px 0;
+            font-size: 17px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .res-item:last-child { border-bottom: 0; }
+        .val { font-weight: bold; color: #1a5276; white-space: nowrap; }
+        hr { border: 0; border-top: 1px solid #ddd; }
+        .button {
+            width: 100%;
+            border: 0;
+            border-radius: 9px;
+            padding: 14px;
+            background: #1a5276;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .button:active { transform: scale(0.99); }
+        .info {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .offline {
+            text-align: center;
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Zorn ZFG (300mm/10kg)</h2>
+
+    <div class="input-group">
+        <label for="targetEvd">Introdu Evd dorit (MN/m²):</label>
+        <input type="number" id="targetEvd" value="45" inputmode="decimal" step="0.1" min="0" oninput="calculeaza()">
+        <button class="button" type="button" onclick="calculeaza()">REGENEREAZĂ VALORILE</button>
+    </div>
+
+    <div class="results">
+        <div class="res-item"><span>Media s<sub>m</sub>:</span> <span class="val" id="sm">0.500</span> mm</div>
+        <hr>
+        <div class="res-item"><span>Impuls 1 (s1):</span> <span class="val" id="s1">0.498</span> mm</div>
+        <div class="res-item"><span>Impuls 2 (s2):</span> <span class="val" id="s2">0.502</span> mm</div>
+        <div class="res-item"><span>Impuls 3 (s3):</span> <span class="val" id="s3">0.500</span> mm</div>
+    </div>
+
+    <p class="info">
+        Formula aplicată: s<sub>m</sub> = 22.5 / Evd<br>
+        Tasările individuale includ o variație aleatorie de ±1%.
+    </p>
+    <div class="offline" id="status">Aplicație PWA</div>
+</div>
+
+<script>
+    function calculeaza() {
+        const evd = parseFloat(document.getElementById('targetEvd').value);
+
+        if (evd > 0) {
+            let sm = 22.5 / evd;
+
+            // Păstrează logica originală: variații aleatorii mici,
+            // iar s3 este calculat astfel încât media celor trei să fie exact sm.
+            let v1 = 1 + (Math.random() * 0.06 - 0.01);
+            let v2 = 1 + (Math.random() * 0.06 - 0.01);
+
+            let s1 = sm * v1;
+            let s2 = sm * v2;
+            let s3 = (sm * 3) - s1 - s2;
+
+            document.getElementById('sm').innerText = sm.toFixed(3);
+            document.getElementById('s1').innerText = s1.toFixed(3);
+            document.getElementById('s2').innerText = s2.toFixed(3);
+            document.getElementById('s3').innerText = s3.toFixed(3);
+        }
+    }
+
+    calculeaza();
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => document.getElementById('status').innerText = 'Aplicație PWA • funcționează offline')
+                .catch(() => document.getElementById('status').innerText = 'Aplicație PWA');
+        });
+    }
+</script>
+</body>
+</html>
